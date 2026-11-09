@@ -33,7 +33,7 @@ export default async function PulsePage({ params }: { params: Promise<{ slug: st
   const maxCategory = facts.openByCategory[0]?.count ?? 1;
 
   return (
-    <RoomFrame slug={slug} name={room.uni.name} active="pulse" back={{ href: `/room/${slug}`, label: "Room" }}>
+    <RoomFrame slug={slug} name={room.uni.name} active="pulse" showAdmin={room.showAdmin} back={{ href: `/room/${slug}`, label: "Room" }}>
       <section className="page-head">
         <h1>Campus Pulse</h1>
         <p>

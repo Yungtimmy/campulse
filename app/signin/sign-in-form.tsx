@@ -56,12 +56,6 @@ export function SignInForm({ next, configured }: { next: string; configured: boo
       <p className="cap" style={{ textAlign: "center" }}>
         We only use your Google name and email. Your name stays hidden on anonymous reports.
       </p>
-      <p style={{ textAlign: "center", fontSize: 14, color: "var(--cp-ink-3)" }}>
-        University administrator?{" "}
-        <a href={`/signin?next=${encodeURIComponent("/admin/funaab")}`} style={{ fontWeight: 600 }}>
-          Admin sign in
-        </a>
-      </p>
     </div>
   );
 }

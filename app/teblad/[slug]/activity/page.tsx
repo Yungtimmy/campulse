@@ -12,7 +12,6 @@ type AuditRow = {
 export default async function ActivityPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const admin = await requireAdmin(slug);
-  if (!admin.ok) return admin.view;
   const { data } = await admin.supabase
     .from("admin_audit")
     .select("id, action, created_at, meta, actor_id")

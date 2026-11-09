@@ -5,7 +5,6 @@ import type { Profile } from "@/lib/types";
 export default async function VerificationsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const admin = await requireAdmin(slug);
-  if (!admin.ok) return admin.view;
   const { data } = await admin.supabase
     .from("profiles")
     .select("id, display_name, verification_status, verification_method, matric_number, faculty, department, level, created_at")

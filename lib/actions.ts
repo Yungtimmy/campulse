@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { HIDDEN_ADMIN_PATH } from "@/lib/admin-gate";
 import { DEPARTMENTS } from "@/lib/labels";
 import { PhotoError, stripExif } from "@/lib/exif";
 import { validateRegistration } from "@/lib/registration";
@@ -173,7 +174,7 @@ export async function saveIncident(formData: FormData): Promise<ActionResult> {
     p_department: department || null,
   });
   if (error) return { ok: false, error: friendly(error.message, "Could not save the change") };
-  revalidatePath("/admin", "layout");
+  revalidatePath(HIDDEN_ADMIN_PATH, "layout");
   revalidatePath("/room", "layout");
   return { ok: true };
 }
@@ -189,7 +190,7 @@ export async function setMemberVerification(profileId: string, status: "verified
     p_note: status === "rejected" ? "Access revoked by a Room admin" : null,
   });
   if (error) return { ok: false, error: friendly(error.message, "Could not update that member") };
-  revalidatePath("/admin", "layout");
+  revalidatePath(HIDDEN_ADMIN_PATH, "layout");
   return { ok: true };
 }
 

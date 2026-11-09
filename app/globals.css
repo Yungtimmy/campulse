@@ -323,6 +323,15 @@ select:disabled{color:var(--cp-ink);opacity:1;cursor:default}
 .tabbar a{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:500;color:var(--cp-ink-3);padding:4px 0;border-radius:10px}
 .tabbar a:hover{text-decoration:none;color:var(--cp-ink)}
 .tabbar a.on{color:var(--cp-indigo)}
+.tabbar nav.has-admin{grid-template-columns:repeat(4,1fr)}
+.tabbar a.tab-admin,.tabbar a.tab-admin:hover{color:var(--cp-amber-ink)}
+.tabbar a.tab-admin .i{color:var(--cp-amber)}
+.tabbar a.tab-admin.on{color:var(--cp-amber-ink);background:var(--cp-amber-tint)}
+
+.nf{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:24px 8px}
+.nf .code{font-family:var(--cp-mono);font-size:13px;color:var(--cp-ink-3)}
+.nf h1{font-weight:700;font-size:28px;line-height:1.15;letter-spacing:-.02em;color:var(--cp-ink);margin:0}
+.nf p.lede{font-size:16px;line-height:1.45;color:var(--cp-ink);margin:0;max-width:30ch}
 
 /* ---------- admin (desktop) ---------- */
 .admin{display:grid;grid-template-columns:232px minmax(0,1fr) 384px;min-height:100vh;position:relative;z-index:1}

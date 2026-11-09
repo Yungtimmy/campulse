@@ -4,7 +4,6 @@ import { requireAdmin } from "@/lib/guard";
 export default async function DepartmentsPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const admin = await requireAdmin(slug);
-  if (!admin.ok) return admin.view;
   const { data } = await admin.supabase
     .from("incidents")
     .select("assigned_department, status")

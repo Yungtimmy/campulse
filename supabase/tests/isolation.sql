@@ -135,6 +135,32 @@ begin
   where (storage.foldername(name))[1] = u2::text;
   if n <> 0 then raise exception 'FUNAAB student saw demo-u2 evidence'; end if;
 
+  select count(*) into n from public.admin_audit;
+  if n <> 0 then raise exception 'student read admin_audit (% rows)', n; end if;
+
+  select count(*) into n from public.admin_roles;
+  if n <> 0 then raise exception 'student read admin_roles (% rows)', n; end if;
+
+  begin
+    select count(*) into n from public.bootstrap_admins;
+    if n <> 0 then raise exception 'student read bootstrap_admins (% rows)', n; end if;
+  exception
+    when insufficient_privilege then
+      null;
+  end;
+
+  begin
+    update public.incidents
+    set status = 'resolved'
+    where id = 'c1000000-0000-4000-8000-000000000142';
+    if found then
+      raise exception 'student updated an incident directly';
+    end if;
+  exception
+    when insufficient_privilege then
+      null;
+  end;
+
   begin
     perform public.set_incident_status(
       'c1000000-0000-4000-8000-000000000142',
