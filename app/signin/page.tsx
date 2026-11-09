@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import { Blobs } from "@/components/chrome";
 import { publicEnv } from "@/lib/env";
+import { safeNext } from "@/lib/registration";
 import { SignInForm } from "./sign-in-form";
+
+export const metadata: Metadata = {
+  title: "Sign in · Campulse",
+  description: "Sign in and verify your FUNAAB affiliation.",
+};
 
 export default async function SignInPage({
   searchParams,
@@ -8,7 +15,7 @@ export default async function SignInPage({
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const params = await searchParams;
-  const next = params.next?.startsWith("/") && !params.next.startsWith("//") ? params.next : "/room/funaab";
+  const next = safeNext(params.next);
   return (
     <>
       <Blobs />
@@ -19,10 +26,10 @@ export default async function SignInPage({
         </header>
         <section className="page-head" style={{ paddingTop: 32 }}>
           <h1>Join the FUNAAB Room</h1>
-          <p>A confirmed email joins the Room. Only members of this Room can read and post reports here.</p>
+          <p>Sign in with Google. Only members of this Room can read and post reports here.</p>
         </section>
         {params.error === "link" ? (
-          <p className="err" style={{ marginTop: 16 }}>That sign-in link expired. Request a new code.</p>
+          <p className="err" style={{ marginTop: 16 }}>Google sign-in did not finish. Try again.</p>
         ) : null}
         <SignInForm next={next} configured={publicEnv() !== null} />
       </main>

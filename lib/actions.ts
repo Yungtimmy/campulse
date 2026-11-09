@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { DEPARTMENTS } from "@/lib/labels";
 import { PhotoError, stripExif } from "@/lib/exif";
+import { validateRegistration } from "@/lib/registration";
 import { getSession, isAdminOf } from "@/lib/session";
 import type { AiSuggestion } from "@/lib/types";
 
@@ -200,10 +201,52 @@ export async function revokeMember(profileId: string): Promise<void> {
   await setMemberVerification(profileId, "rejected");
 }
 
+export async function completeRegistration(formData: FormData): Promise<ActionResult> {
+  const session = await getSession();
+  if (!session.supabase || !session.user) {
+    return { ok: false, error: "Sign in with Google first" };
+  }
+  if (session.profile?.verification_status === "rejected") {
+    return { ok: false, error: "A Room admin revoked this account" };
+  }
+  if (session.profile?.registered_at && session.profile.verification_status === "verified") {
+    return { ok: true };
+  }
+
+  const parsed = validateRegistration({
+    fullName: String(formData.get("fullName") ?? ""),
+    faculty: String(formData.get("faculty") ?? ""),
+    department: String(formData.get("department") ?? ""),
+    level: String(formData.get("level") ?? ""),
+    matricNumber: String(formData.get("matric") ?? ""),
+  });
+  if (!parsed.ok) return parsed;
+
+  const { data, error } = await session.supabase
+    .from("profiles")
+    .update({
+      display_name: parsed.value.fullName,
+      faculty: parsed.value.faculty,
+      department: parsed.value.department,
+      level: parsed.value.level,
+      matric_number: parsed.value.matricNumber,
+    })
+    .eq("id", session.user.id)
+    .select("registered_at, verification_status")
+    .maybeSingle();
+
+  if (error || !data?.registered_at || data.verification_status !== "verified") {
+    return { ok: false, error: friendly(error?.message, "The profile could not be saved") };
+  }
+
+  revalidatePath("/room", "layout");
+  return { ok: true };
+}
+
 export async function requestManualApproval(formData: FormData): Promise<ActionResult> {
   const session = await getSession();
   if (!session.supabase || !session.user) {
-    return { ok: false, error: "Confirm your email first. Manual approval is a backup after you have an account." };
+    return { ok: false, error: "Sign in first. Manual approval is a backup after you have an account." };
   }
   const matric = String(formData.get("matric") ?? "");
   let photoPath: string | null = null;
