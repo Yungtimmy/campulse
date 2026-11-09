@@ -8,7 +8,7 @@ export default async function VerificationsPage({ params }: { params: Promise<{ 
   if (!admin.ok) return admin.view;
   const { data } = await admin.supabase
     .from("profiles")
-    .select("id, display_name, verification_status, verification_method, matric_number, created_at")
+    .select("id, display_name, verification_status, verification_method, matric_number, faculty, department, level, created_at")
     .eq("university_id", admin.uni.id)
     .order("created_at", { ascending: false });
   const profiles = (data ?? []) as unknown as Profile[];
@@ -20,7 +20,7 @@ export default async function VerificationsPage({ params }: { params: Promise<{ 
       <div className="mhead">
         <div>
           <h1>Verifications</h1>
-          <p>A confirmed email joins this Room. Approve or revoke here only when someone is stuck.</p>
+          <p>A Google account and a short profile join this Room. Approve or revoke here when access needs a human decision.</p>
         </div>
       </div>
       <section className="card" style={{ marginTop: 20 }}>
@@ -54,6 +54,9 @@ function MemberList({
             <div className="rt">{profile.display_name ?? "Student"}</div>
             <div className="rmeta">
               <span>{profile.verification_status}</span>
+              {profile.faculty ? <span>{profile.faculty}</span> : null}
+              {profile.department ? <span>{profile.department}</span> : null}
+              {profile.level ? <span>Level {profile.level}</span> : null}
               {profile.matric_number ? <span>Matric {profile.matric_number}</span> : null}
               {profile.verification_method ? <span>{profile.verification_method}</span> : null}
             </div>

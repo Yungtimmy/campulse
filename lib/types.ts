@@ -41,11 +41,16 @@ export type Profile = {
   id: string;
   university_id: string | null;
   display_name: string | null;
+  avatar_url: string | null;
   verification_status: "pending" | "verified" | "rejected";
   verification_method: string | null;
   verified_at: string | null;
   show_profile: boolean;
   matric_number: string | null;
+  faculty: string | null;
+  department: string | null;
+  level: string | null;
+  registered_at: string | null;
 };
 
 export type University = {

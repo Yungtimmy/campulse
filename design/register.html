@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Your profile · Campulse</title><meta name="description" content="Complete your Campulse profile.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="campulse.css">
+<!-- Campulse V1 design pack · craft passes per unslop by Damir Sokolovsky (@heydamir), CC BY 4.0 -->
+</head><body><div class="blobs" aria-hidden="true"><i></i><i></i></div>
+<main class="app auth" style="padding-bottom:48px">
+<header class="top"><span class="room-pill">FUNAAB Room</span><span class="wordmark">Campulse</span></header>
+<section class="page-head" style="padding-top:32px">
+  <h1>Tell us who you are</h1>
+  <p>One short step, then you are in the FUNAAB Room.</p>
+</section>
+
+<div class="stack">
+  <section class="card">
+    <div style="display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--cp-line,rgba(0,0,0,.08))">
+      <span style="width:40px;height:40px;border-radius:50%;background:var(--cp-indigo-50,#e8e5fa);color:var(--cp-indigo,#1800ac);display:grid;place-items:center;font-weight:600">AA</span>
+      <div style="min-width:0"><b style="display:block;font-size:15px">Signed in with Google</b><span class="cap" style="font-family:var(--cp-mono,monospace)">a.adeyemi@gmail.com</span></div>
+    </div>
+    <div class="field" style="margin-top:16px"><label for="n">Full name</label><input id="n" type="text" value="Adebola Adeyemi" autocomplete="name"><span class="hint">Filled from Google. Change it if it's not the name you use on campus.</span></div>
+    <div class="field"><label for="f">Faculty</label><select id="f"><option value="" selected disabled>Choose your faculty</option><option>College of Engineering (demo)</option><option>College of Natural Sciences (demo)</option><option>College of Agricultural Management (demo)</option></select></div>
+    <div class="field"><label for="d">Department</label><select id="d"><option value="" selected disabled>Choose your department</option><option>Computer Science (demo)</option><option>Mechanical Engineering (demo)</option><option>Microbiology (demo)</option></select></div>
+    <div class="field"><label for="l">Level</label><select id="l"><option value="" selected disabled>Choose your level</option><option>100</option><option>200</option><option>300</option><option>400</option><option>500</option><option>Postgraduate</option></select></div>
+    <div class="field"><label for="m">Matric number <span style="font-weight:400;color:var(--cp-ink-3)">(optional)</span></label><input id="m" type="text" placeholder="Matric number" inputmode="numeric"><span class="hint">Helps admins confirm you if a report needs follow-up. Never shown to other students.</span></div>
+    <button class="btn btn-primary btn-block" type="button" style="margin-top:24px">Join the FUNAAB Room</button>
+  </section>
+  <p class="cap" style="text-align:center">You can edit these later in your profile.</p>
+</div>
+</main>
+</body></html>

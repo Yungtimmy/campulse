@@ -9,9 +9,11 @@ export async function requireRoom(slug: string) {
     return { ok: false as const, view: <SetupNotice /> };
   }
   if (!session.user) redirect("/signin");
-  if (session.profile?.verification_status !== "verified" || !session.profile.university_id) {
-    redirect("/pending");
+  if (session.profile?.verification_status === "rejected") redirect("/pending");
+  if (session.profile?.verification_status !== "verified") {
+    redirect(session.profile?.registered_at ? "/pending" : "/register");
   }
+  if (!session.profile.university_id) redirect("/pending");
   const uni = await universityBySlug(session.supabase, slug);
   const { data: homeUni } = await session.supabase
     .from("universities")
@@ -31,7 +33,10 @@ export async function requireAdmin(slug: string) {
     return { ok: false as const, view: <SetupNotice /> };
   }
   if (!session.user) redirect("/signin");
-  if (session.profile?.verification_status !== "verified") redirect("/pending");
+  if (session.profile?.verification_status === "rejected") redirect("/pending");
+  if (session.profile?.verification_status !== "verified") {
+    redirect(session.profile?.registered_at ? "/pending" : "/register");
+  }
   const uni = await universityBySlug(session.supabase, slug);
   if (!uni || !isAdminOf(session.roles, uni.id)) redirect("/room/funaab");
   return { ok: true as const, session, uni, supabase: session.supabase };

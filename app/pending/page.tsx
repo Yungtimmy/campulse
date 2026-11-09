@@ -8,6 +8,7 @@ export default async function PendingPage() {
   if (!session.configured) return <SetupNotice />;
   if (!session.user) redirect("/signin");
   if (session.profile?.verification_status === "verified") redirect("/room/funaab");
+  if (!session.profile?.registered_at && session.profile?.verification_status !== "rejected") redirect("/register");
   const rejected = session.profile?.verification_status === "rejected";
 
   return (
@@ -23,7 +24,7 @@ export default async function PendingPage() {
           <p>
             {rejected
               ? "A FUNAAB Room admin revoked this account. You can request manual approval. Until it is approved, the Room stays empty."
-              : "A confirmed email joins the FUNAAB Room immediately. This screen is the backup, for an account that is still pending."}
+              : "This account is not in the FUNAAB Room yet. A Room admin can approve the request below."}
           </p>
         </section>
         <PendingForm email={session.user.email ?? "your email"} matric={session.profile?.matric_number ?? ""} />
