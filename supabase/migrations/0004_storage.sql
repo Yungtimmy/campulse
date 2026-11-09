@@ -8,7 +8,12 @@ values
   ('identity-docs', 'identity-docs', false)
 on conflict (id) do nothing;
 
-alter table storage.objects enable row level security;
+do $rls$
+begin
+  if not (select relrowsecurity from pg_class where oid = 'storage.objects'::regclass) then
+    execute 'alter table storage.objects enable row level security';
+  end if;
+end $rls$;
 
 do $$
 begin
