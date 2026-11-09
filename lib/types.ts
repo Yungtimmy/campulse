@@ -25,7 +25,6 @@ export type FeedIncident = {
   verified_at: string | null;
   resolved_at: string | null;
   reopened_count: number;
-  is_demo: boolean;
   affected_count: number;
   description: string | null;
   is_anonymous: boolean | null;
@@ -87,5 +86,4 @@ export type PulseSnapshot = {
   score: number | null;
   band: string | null;
   label: string;
-  includes_demo: boolean;
 };

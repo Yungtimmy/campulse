@@ -117,7 +117,6 @@ svg.i.sm{width:16px;height:16px}
 
 /* chips / tags */
 .tag{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:var(--r-tag);font-size:12px;font-weight:500;background:var(--cp-raised);color:var(--cp-ink-2);white-space:nowrap}
-.tag.demo{background:transparent;border:1px dashed var(--cp-line-2);color:var(--cp-ink-3)}
 .tag.pending{background:transparent;border:1px solid rgba(143,101,38,.35);color:var(--cp-amber-ink)}
 .tag.adv{background:var(--cp-blue-tint);color:var(--cp-blue-ink)}
 

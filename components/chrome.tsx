@@ -136,10 +136,6 @@ export function StatusText({ status }: { status: string }) {
   return <span className={`status ${STATUS_CLASS[status] ?? ""}`}>{STATUS_LABEL[status] ?? status}</span>;
 }
 
-export function DemoChip({ children = "Demo" }: { children?: string }) {
-  return <span className="tag demo">{children}</span>;
-}
-
 export function ConfidenceTag({ label }: { label: ConfidenceLabel }) {
   return <span className={label === "calibrating" ? "tag pending" : "tag"}>{CONFIDENCE_LABEL[label]}</span>;
 }

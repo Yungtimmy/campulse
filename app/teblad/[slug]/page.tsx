@@ -1,10 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import Link from "next/link";
-import { DemoChip } from "@/components/chrome";
+import { CollegeDepartmentFilters } from "@/components/college-department-filters";
 import { IconScan, IconSearch } from "@/components/icons";
+import { departmentsFor } from "@/lib/campus";
 import { pulseDelta, targetSummary } from "@/lib/data";
 import { loadFeed } from "@/lib/data";
-import { includeDemoPulse } from "@/lib/env";
 import { briefingSentences, roomFacts } from "@/lib/facts";
 import { HIDDEN_ADMIN_PATH } from "@/lib/admin-gate";
 import { requireAdmin } from "@/lib/guard";
@@ -28,17 +28,26 @@ export default async function AdminQueue({
   const admin = await requireAdmin(slug);
 
   const incidents = await loadFeed(admin.supabase, admin.uni.id);
-  const { result, snapshots } = await loadPulse(admin.supabase, admin.uni.id, includeDemoPulse());
+  const { data: people } = await admin.supabase
+    .from("profiles")
+    .select("id, faculty, department")
+    .eq("university_id", admin.uni.id);
+  const authors = new Map(
+    ((people ?? []) as Array<{ id: string; faculty: string | null; department: string | null }>).map((person) => [
+      person.id,
+      person,
+    ]),
+  );
+  const { result, snapshots } = await loadPulse(admin.supabase, admin.uni.id);
   const facts = roomFacts(incidents, result, {
     ackTargetHours: admin.uni.ack_target_hours,
     resolveTargetDays: admin.uni.resolve_target_days,
   });
-  const filtered = filterIncidents(incidents, query);
+  const filtered = filterIncidents(incidents, query, authors);
   const selected = filtered.find((incident) => incident.id === query.id) ?? filtered[0] ?? null;
   const activity = selected ? await loadActivity(admin.supabase as SupabaseClient, selected.id) : [];
   const base = `${HIDDEN_ADMIN_PATH}/${slug}`;
   const clearHref = hrefFor(base, { ...query, id: undefined });
-  const demoOnly = incidents.length > 0 && incidents.every((incident) => incident.is_demo);
   const delta = pulseDelta(result.score, snapshots);
   const notAck = incidents.filter((incident) => incident.status === "submitted");
   const pastAck = facts.pastAckTarget;
@@ -51,10 +60,8 @@ export default async function AdminQueue({
             <h1>Report queue</h1>
             <p>
               {slug === "funaab" ? "FUNAAB Room" : admin.uni.name} · {formatWhen(new Date())}
-              {demoOnly ? " · all figures are demo seed data" : facts.includesDemo ? " · includes demo seed data" : ""}
             </p>
           </div>
-          {facts.includesDemo ? <DemoChip>Demo data</DemoChip> : null}
         </div>
 
         <div className="stats">
@@ -85,7 +92,7 @@ export default async function AdminQueue({
 
         <section className="brief" id="briefing">
           <h2><IconScan />Campus briefing</h2>
-          <BriefingButton slug={slug} initial={briefingSentences(facts)} includesDemo={facts.includesDemo} />
+          <BriefingButton slug={slug} initial={briefingSentences(facts)} />
         </section>
 
         <form className="filters" role="search" action={base}>
@@ -117,6 +124,7 @@ export default async function AdminQueue({
             <option value="30">Last 30 days</option>
             <option value="90">Last 90 days</option>
           </select>
+          <CollegeDepartmentFilters faculty={query.faculty ?? ""} department={query.department ?? ""} />
           <button className="link-btn clear" type="submit">Apply</button>
           <Link className="clear" href={base}>Clear</Link>
         </form>
@@ -163,21 +171,35 @@ export default async function AdminQueue({
             </tbody>
           </table>
         </div>
-        <p className="cap" style={{ marginTop: 12 }}>
-          Showing {filtered.length} of {incidents.length} incidents
-          {facts.includesDemo ? " · Demo data" : ""}
-        </p>
+        {incidents.length === 0 ? (
+          <p className="hint" style={{ marginTop: 12 }}>No reports yet.</p>
+        ) : filtered.length === 0 ? (
+          <p className="hint" style={{ marginTop: 12 }}>No reports match these filters.</p>
+        ) : (
+          <p className="cap" style={{ marginTop: 12 }}>
+            Showing {filtered.length} of {incidents.length} incidents
+          </p>
+        )}
       </main>
       <AdminPanel key={selected?.id ?? "none"} incident={selected} slug={slug} activity={activity} clearHref={clearHref} />
     </>
   );
 }
 
-function filterIncidents(incidents: FeedIncident[], query: Record<string, string | undefined>) {
+function filterIncidents(
+  incidents: FeedIncident[],
+  query: Record<string, string | undefined>,
+  authors: Map<string, { faculty: string | null; department: string | null }>,
+) {
   const status = query.status ?? "open";
   const range = Number(query.range ?? "30");
   const since = Date.now() - range * 86_400_000;
   const q = (query.q ?? "").trim().toLowerCase();
+  const faculty = query.faculty ?? "";
+  const department =
+    faculty && (departmentsFor(faculty) as readonly string[]).includes(query.department ?? "")
+      ? query.department ?? ""
+      : "";
   return incidents.filter((incident) => {
     if (status === "open" && !OPEN.includes(incident.status)) return false;
     if (status !== "open" && status !== "all" && incident.status !== status) return false;
@@ -185,6 +207,11 @@ function filterIncidents(incidents: FeedIncident[], query: Record<string, string
     if (query.severity && incident.severity !== query.severity) return false;
     if (new Date(incident.opened_at).getTime() < since && incident.status !== "submitted") return false;
     if (q && !`${incident.title} ${incident.public_code} ${incident.description ?? ""}`.toLowerCase().includes(q)) return false;
+    if (faculty || department) {
+      const author = incident.author_id ? authors.get(incident.author_id) : undefined;
+      if (!author || (faculty && author.faculty !== faculty)) return false;
+      if (department && author.department !== department) return false;
+    }
     return true;
   });
 }

@@ -15,9 +15,8 @@ export default async function DepartmentsPage({ params }: { params: Promise<{ sl
       <div className="mhead">
         <div>
           <h1>Departments</h1>
-          <p>Assignment is a note on the incident, not a status. Department list is demo data.</p>
+          <p>Assignment is a note on the incident, not a status. These are the campus units a report can be assigned to.</p>
         </div>
-        <span className="tag demo">Demo data</span>
       </div>
       <div className="stats" style={{ gridTemplateColumns: "1fr 1fr" }}>
         {DEPARTMENTS.map((name) => {

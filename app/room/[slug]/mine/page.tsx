@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CategoryAvatar, DemoChip, RoomFrame, StatusPill } from "@/components/chrome";
+import { CategoryAvatar, RoomFrame, StatusPill } from "@/components/chrome";
 import { requireRoom } from "@/lib/guard";
 import type { FeedIncident } from "@/lib/types";
 
@@ -39,7 +39,6 @@ export default async function MinePage({ params }: { params: Promise<{ slug: str
                   <div className="rmeta">
                     <StatusPill status={incident.status} />
                     <span className="mono">{incident.public_code}</span>
-                    {incident.is_demo ? <DemoChip /> : null}
                   </div>
                 </div>
               </Link>

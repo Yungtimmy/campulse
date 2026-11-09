@@ -4,7 +4,3 @@ export function publicEnv(): { url: string; key: string } | null {
   if (!url || !key) return null;
   return { url, key };
 }
-
-export function includeDemoPulse(): boolean {
-  return process.env.PULSE_INCLUDE_DEMO === "true";
-}

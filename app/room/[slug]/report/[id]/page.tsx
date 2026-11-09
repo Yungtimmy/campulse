@@ -1,5 +1,5 @@
 import { CategoryIcon, IconCheck, IconScan } from "@/components/icons";
-import { DemoChip, RoomFrame, StatusPill } from "@/components/chrome";
+import { RoomFrame, StatusPill } from "@/components/chrome";
 import { loadEvents, loadIncident } from "@/lib/data";
 import { requireRoom } from "@/lib/guard";
 import { CATEGORY_LABEL, formatWhen, STATUS_LABEL } from "@/lib/labels";
@@ -87,7 +87,6 @@ export default async function ReportDetailPage({
             <CategoryIcon category={incident.category} small />
             {CATEGORY_LABEL[incident.category] ?? incident.category}
           </span>
-          {incident.is_demo ? <DemoChip /> : null}
         </div>
         <h1 style={{ marginTop: 12 }}>{incident.title}</h1>
         <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap", marginTop: 12 }}>

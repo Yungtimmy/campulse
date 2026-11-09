@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { FACULTIES, LEVELS, STUDENT_DEPARTMENTS } from "./campus.ts";
+import { COLLEGES, collegeLabel, departmentsFor } from "./campus.ts";
 import {
   googleDisplayName,
   initials,
@@ -9,11 +9,18 @@ import {
   validateRegistration,
 } from "./registration.ts";
 
+const coleng = COLLEGES.find((college) => college.acronym === "COLENG")!;
+const colcomps = COLLEGES.find((college) => college.acronym === "COLCOMPS")!;
+const colphys = COLLEGES.find((college) => college.acronym === "COLPHYS")!;
+const colbios = COLLEGES.find((college) => college.acronym === "COLBIOS")!;
+const colvet = COLLEGES.find((college) => college.acronym === "COLVET")!;
+const colfhec = COLLEGES.find((college) => college.acronym === "COLFHEC")!;
+
 const valid = {
   fullName: "Adebola Adeyemi",
-  faculty: FACULTIES[0],
-  department: STUDENT_DEPARTMENTS[0],
-  level: LEVELS[0],
+  faculty: collegeLabel(coleng),
+  department: "Mechanical Engineering",
+  level: "100",
   matricNumber: "",
 };
 
@@ -53,13 +60,33 @@ describe("needsRegistration", () => {
   });
 });
 
+describe("FUNAAB colleges", () => {
+  it("lists 11 colleges and 57 departments, with Computer Science only in COLCOMPS", () => {
+    const departments = COLLEGES.flatMap((college) => [...college.departments]);
+    assert.equal(COLLEGES.length, 11);
+    assert.equal(departments.length, 57);
+    assert.equal(new Set(departments).size, 57);
+    assert.deepEqual(departmentsFor(collegeLabel(colcomps)), [
+      "Computer Science",
+      "Information Systems",
+      "Software Engineering",
+      "Cybersecurity",
+      "Data Science",
+      "Information Technology",
+      "Information and Communication Technology",
+    ]);
+    assert.equal(colphys.departments.includes("Computer Science" as never), false);
+    assert.equal(colcomps.levels, "100-400");
+  });
+});
+
 describe("validateRegistration", () => {
   it("accepts a complete profile and an empty matric number", () => {
     const result = validateRegistration(valid);
     assert.equal(result.ok, true);
     if (result.ok) {
       assert.equal(result.value.fullName, "Adebola Adeyemi");
-      assert.equal(result.value.faculty, FACULTIES[0]);
+      assert.equal(result.value.faculty, collegeLabel(coleng));
       assert.equal(result.value.level, "100");
       assert.equal(result.value.matricNumber, null);
     }
@@ -71,11 +98,167 @@ describe("validateRegistration", () => {
     if (result.ok) assert.equal(result.value.matricNumber, "2019/1234");
   });
 
-  it("rejects a faculty or level outside the config list", () => {
+  it("rejects a college, department, or level outside the config list", () => {
     assert.equal(validateRegistration({ ...valid, faculty: "Made up college" }).ok, false);
     assert.equal(validateRegistration({ ...valid, department: "History" }).ok, false);
     assert.equal(validateRegistration({ ...valid, level: "600" }).ok, false);
     assert.equal(validateRegistration({ ...valid, fullName: "A" }).ok, false);
     assert.equal(validateRegistration({ ...valid, matricNumber: "x".repeat(41) }).ok, false);
+  });
+
+  it("accepts only a department that belongs to the chosen college, at a level that college runs", () => {
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(coleng),
+        department: "Computer Science",
+        level: "100",
+      }).ok,
+      false,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Computer Science",
+        level: "400",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Cybersecurity",
+        level: "500",
+      }).ok,
+      false,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Data Science",
+        level: "100",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Information Systems",
+        level: "200",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Software Engineering",
+        level: "300",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Information Technology",
+        level: "400",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Information and Communication Technology",
+        level: "400",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colcomps),
+        department: "Cyber Security and Data Science",
+        level: "100",
+      }).ok,
+      false,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colbios),
+        department: "Biochemistry",
+        level: "400",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colbios),
+        department: "Biochemistry",
+        level: "500",
+      }).ok,
+      false,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colvet),
+        department: "Veterinary Anatomy",
+        level: "600",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colfhec),
+        department: "Food Science and Technology",
+        level: "500",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colfhec),
+        department: "Hospitality and Tourism Management",
+        level: "500",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colfhec),
+        department: "Home Science and Management",
+        level: "400",
+      }).ok,
+      true,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colfhec),
+        department: "Home Science and Management",
+        level: "500",
+      }).ok,
+      false,
+    );
+    assert.equal(
+      validateRegistration({
+        ...valid,
+        faculty: collegeLabel(colfhec),
+        department: "Nutrition and Dietetics",
+        level: "500",
+      }).ok,
+      false,
+    );
   });
 });

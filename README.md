@@ -32,15 +32,15 @@ npm run build
 - Manual approve and revoke stay on the admin verifications page. Revoke still closes the Room for that account. RLS and the security-definer functions still require an admin role for admin data and status changes.
 - `rejected` is a normal admin status and requires a reason.
 - Problem burden is `min(100, 10 × Σ severity × confidence)`. It is not divided by a student or member count.
-- Demo rows are stored with `is_demo`. Pulse ignores them unless `PULSE_INCLUDE_DEMO=true`.
+- Campus Pulse is computed from the Room's reports. Higher is worse.
 
 ## Google sign-in (hosted Supabase)
 
 1. In Google Cloud, create an OAuth client and set the authorized redirect URI to `https://rdgkvosixhfzslgdneiw.supabase.co/auth/v1/callback`.
 2. In the Supabase dashboard, enable the Google provider and paste that client ID and secret.
 3. Add this app's origin and `/auth/callback` to Supabase Auth redirect URLs.
-4. Put the founder's Gmail in `public.bootstrap_admins` before they submit the registration form. The local demo row is `admin@campulse.demo`. On the hosted project, change that email or add a row for the real Gmail. The FUNAAB admin role is granted when that address becomes a verified member (when they finish registration, or on a later sign-in if the row is added after). They sign in with Google on `/signin`, then open `/teblad`.
+4. Put the founder's Gmail in `public.bootstrap_admins` before they submit the registration form. The FUNAAB admin role is granted when that address becomes a verified member (when they finish registration, or on a later sign-in if the row is added after). They sign in with Google on `/signin`, then open `/teblad`.
 
-Faculty and department options live in `lib/campus.ts`. They are demo placeholders until the real FUNAAB list is dropped in.
+College and department options live in `lib/campus.ts`. The registration form stores the college as `faculty` (full name plus acronym, for example `College of Engineering (COLENG)`). Department and level choices follow the college. COLCOMPS has seven departments and runs 100–400. COLFHEC levels follow the department.
 
 There is no ranking between universities.

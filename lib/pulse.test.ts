@@ -29,20 +29,15 @@ function incident(overrides: Partial<PulseIncident> = {}): PulseIncident {
     reopenedCount: 0,
     locationTag: null,
     confirmationCount: 0,
-    isDemo: false,
     ...overrides,
   };
 }
 
-function pulse(
-  incidents: PulseIncident[],
-  extra: { verifiedMembers?: number; includeDemo?: boolean } = {},
-) {
+function pulse(incidents: PulseIncident[], extra: { verifiedMembers?: number } = {}) {
   return computePulse({
     incidents,
     verifiedMembers: extra.verifiedMembers ?? 20,
     now: NOW,
-    includeDemo: extra.includeDemo ?? false,
   });
 }
 
@@ -240,14 +235,13 @@ describe("computePulse", () => {
     assert.equal(emergency.band, "emergency");
   });
 
-  it("excludes demo rows unless the flag is on", () => {
-    const demo = Array.from({ length: 5 }, (_, index) =>
-      lateOpen(`d-${index}`, "critical", `d-${index}`),
-    ).map((row) => ({ ...row, isDemo: true }));
-    assert.equal(pulse(demo).label, "insufficient");
-    assert.equal(pulse(demo).score, null);
-    const included = pulse(demo, { includeDemo: true });
-    assert.equal(included.includesDemo, true);
-    assert.equal(included.score, 100);
+  it("counts every incident it is given", () => {
+    const rows = Array.from({ length: 5 }, (_, index) =>
+      lateOpen(`row-${index}`, "critical", `c-${index}`),
+    );
+    const result = pulse(rows);
+    assert.equal(result.countedIncidents, 5);
+    assert.equal(result.score, 100);
+    assert.equal(result.label, "provisional");
   });
 });

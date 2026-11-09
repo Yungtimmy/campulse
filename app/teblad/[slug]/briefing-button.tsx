@@ -5,11 +5,9 @@ import { useState } from "react";
 export function BriefingButton({
   slug,
   initial,
-  includesDemo,
 }: {
   slug: string;
   initial: string;
-  includesDemo: boolean;
 }) {
   const [text, setText] = useState(initial);
   const [source, setSource] = useState<"records" | "groq">("records");
@@ -46,7 +44,6 @@ export function BriefingButton({
       <p>{text}</p>
       <div className="meta">
         <span className="tag adv">Advisory</span>
-        {includesDemo ? <span className="tag demo">Demo data</span> : null}
         <span className="cap">
           {source === "groq"
             ? "Figures come from Room records. AI only writes the sentences."
