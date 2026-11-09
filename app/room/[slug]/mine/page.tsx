@@ -21,7 +21,7 @@ export default async function MinePage({ params }: { params: Promise<{ slug: str
   }
 
   return (
-    <RoomFrame slug={slug} name={room.uni.name} active="room" back={{ href: `/room/${slug}`, label: "Room" }}>
+    <RoomFrame slug={slug} name={room.uni.name} active="room" showAdmin={room.showAdmin} back={{ href: `/room/${slug}`, label: "Room" }}>
       <section className="page-head">
         <h1>My reports</h1>
         <p>Includes anonymous reports you filed. Other students still cannot see your name on those.</p>

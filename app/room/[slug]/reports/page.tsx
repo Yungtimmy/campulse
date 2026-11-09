@@ -11,7 +11,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ slug: 
   const incidents = await loadFeed(room.supabase, room.uni.id);
 
   return (
-    <RoomFrame slug={slug} name={room.uni.name} active="room" back={{ href: `/room/${slug}`, label: "Room" }}>
+    <RoomFrame slug={slug} name={room.uni.name} active="room" showAdmin={room.showAdmin} back={{ href: `/room/${slug}`, label: "Room" }}>
       <section className="page-head">
         <h1>Reports</h1>
         <p>{incidents.length} incident{incidents.length === 1 ? "" : "s"} in the {room.uni.name} Room. Duplicates are grouped.</p>

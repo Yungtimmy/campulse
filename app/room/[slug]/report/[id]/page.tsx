@@ -25,7 +25,7 @@ export default async function ReportDetailPage({
   const incident = await loadIncident(room.supabase, id);
   if (!incident || incident.university_id !== room.uni.id) {
     return (
-      <RoomFrame slug={slug} name={room.uni.name} active="room" back={{ href: `/room/${slug}`, label: "Room" }}>
+      <RoomFrame slug={slug} name={room.uni.name} active="room" showAdmin={room.showAdmin} back={{ href: `/room/${slug}`, label: "Room" }}>
         <section className="page-head">
           <h1>Report not found</h1>
           <p>It may belong to another Room, or it is no longer available.</p>
@@ -79,7 +79,7 @@ export default async function ReportDetailPage({
   const resolve = resolveCard(incident, room.uni.resolve_target_days);
 
   return (
-    <RoomFrame slug={slug} name={room.uni.name} active="room" back={{ href: `/room/${slug}`, label: "Room" }}>
+    <RoomFrame slug={slug} name={room.uni.name} active="room" showAdmin={room.showAdmin} back={{ href: `/room/${slug}`, label: "Room" }}>
       <section className="page-head">
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <span className="mono" style={{ color: "var(--cp-ink-3)" }}>{incident.public_code}</span>

@@ -6,6 +6,7 @@ import { pulseDelta, targetSummary } from "@/lib/data";
 import { loadFeed } from "@/lib/data";
 import { includeDemoPulse } from "@/lib/env";
 import { briefingSentences, roomFacts } from "@/lib/facts";
+import { HIDDEN_ADMIN_PATH } from "@/lib/admin-gate";
 import { requireAdmin } from "@/lib/guard";
 import { BAND_LABEL, CATEGORIES, CATEGORY_LABEL, formatWhen, SEVERITY_CLASS, SEVERITY_LABEL, STATUS_CLASS, STATUS_LABEL } from "@/lib/labels";
 import { loadPulse } from "@/lib/pulse-load";
@@ -25,7 +26,6 @@ export default async function AdminQueue({
   const { slug } = await params;
   const query = await searchParams;
   const admin = await requireAdmin(slug);
-  if (!admin.ok) return admin.view;
 
   const incidents = await loadFeed(admin.supabase, admin.uni.id);
   const { result, snapshots } = await loadPulse(admin.supabase, admin.uni.id, includeDemoPulse());
@@ -36,7 +36,7 @@ export default async function AdminQueue({
   const filtered = filterIncidents(incidents, query);
   const selected = filtered.find((incident) => incident.id === query.id) ?? filtered[0] ?? null;
   const activity = selected ? await loadActivity(admin.supabase as SupabaseClient, selected.id) : [];
-  const base = `/admin/${slug}`;
+  const base = `${HIDDEN_ADMIN_PATH}/${slug}`;
   const clearHref = hrefFor(base, { ...query, id: undefined });
   const demoOnly = incidents.length > 0 && incidents.every((incident) => incident.is_demo);
   const delta = pulseDelta(result.score, snapshots);

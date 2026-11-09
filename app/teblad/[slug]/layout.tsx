@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DemoChip } from "@/components/chrome";
 import { IconBuilding, IconClock, IconFile, IconInbox, IconPulse, IconUserCheck } from "@/components/icons";
+import { HIDDEN_ADMIN_PATH } from "@/lib/admin-gate";
 import { requireAdmin } from "@/lib/guard";
 import { roomPill } from "@/lib/labels";
 
@@ -13,7 +14,7 @@ export default async function AdminLayout({
 }) {
   const { slug } = await params;
   const admin = await requireAdmin(slug);
-  if (!admin.ok) return admin.view;
+  const base = `${HIDDEN_ADMIN_PATH}/${slug}`;
 
   const [{ count: openCount }, { count: pendingCount }] = await Promise.all([
     admin.supabase
@@ -38,7 +39,7 @@ export default async function AdminLayout({
           </Link>
           <span className="room-pill sm">{slug === "funaab" ? "FUNAAB" : roomPill(slug, admin.uni.name)}</span>
         </div>
-        <Link className="nav" href={`/admin/${slug}`}>
+        <Link className="nav" href={base}>
           <IconInbox />
           Report queue
           <span className="c">{openCount ?? 0}</span>
@@ -47,21 +48,21 @@ export default async function AdminLayout({
           <IconPulse />
           Campus Pulse
         </Link>
-        <a className="nav" href={`/admin/${slug}#briefing`}>
+        <a className="nav" href={`${base}#briefing`}>
           <IconFile />
           Campus briefing
         </a>
         <div className="sec">Admin</div>
-        <Link className="nav" href={`/admin/${slug}/verifications`}>
+        <Link className="nav" href={`${base}/verifications`}>
           <IconUserCheck />
           Verifications
           <span className="c">{pendingCount ?? 0}</span>
         </Link>
-        <Link className="nav" href={`/admin/${slug}/departments`}>
+        <Link className="nav" href={`${base}/departments`}>
           <IconBuilding />
           Departments
         </Link>
-        <Link className="nav" href={`/admin/${slug}/activity`}>
+        <Link className="nav" href={`${base}/activity`}>
           <IconClock />
           Activity log
         </Link>

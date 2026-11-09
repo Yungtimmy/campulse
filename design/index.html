@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Campulse · FUNAAB Room</title><meta name="description" content="Report campus issues and track how they are resolved.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="campulse.css">
+<!-- Campulse V1 design pack · craft passes per unslop by Damir Sokolovsky (@heydamir), CC BY 4.0 -->
+</head><body><div class="blobs" aria-hidden="true"><i></i><i></i></div>
+<main class="app">
+<header class="top"><span class="room-pill">FUNAAB Room</span><a class="wordmark" href="index.html">Campulse</a></header>
+<section class="hero">
+  <h1>Your Campus.<br>Your Voice.<br>Real Solutions.</h1>
+  <p class="lede">Report campus issues and track how they're resolved.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="report.html">Report an issue</a>
+    <a class="btn btn-outline" href="pulse.html">View Campus Pulse</a>
+    <a class="icon-btn" href="report-detail.html" aria-label="My reports" title="My reports"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></a>
+  </div>
+</section>
+
+<div class="stack rise">
+  <a class="card" href="pulse.html" style="display:block;color:inherit;text-decoration:none" aria-label="Open Campus Pulse breakdown">
+    <div class="pulse-mini">
+      <div class="g-wrap">
+        <div class="gauge"><svg viewBox="0 0 100 78" role="img" aria-label="Campus Pulse 42 of 100, Elevated"><path class="trk" d="M12.41 63.68 A40 40 0 1 1 87.59 63.68" pathLength="100" fill="none" stroke-width="7" stroke-linecap="round"/><path class="resp" d="M12.41 63.68 A40 40 0 1 1 87.59 63.68" pathLength="100" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="42.35 200"/><path class="cond" d="M12.41 63.68 A40 40 0 1 1 87.59 63.68" pathLength="100" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="27.4 200"/></svg></div>
+        <div class="gauge-read"><span class="gauge-num">42</span><span class="band elevated">Elevated</span></div>
+      </div>
+      <div>
+        <div class="cap" style="margin-bottom:8px">Component weights</div>
+        <div class="comp-grid">
+          <div><span>Severity</span><b>40%</b></div>
+          <div><span>Resolution</span><b>25%</b></div>
+          <div><span>Response</span><b>15%</b></div>
+          <div><span>Recurring</span><b>20%</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="pulse-foot">
+      <span class="cap">0 healthy · 100 emergency · higher is worse</span>
+      <span class="tag pending" title="Default — pending founder">Calibrating · pilot weights</span>
+      <span class="tag demo">Demo data</span>
+    </div>
+  </a>
+
+  <section class="card" aria-label="How the Room works">
+    <ul class="trust">
+      <li><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg></span><div><b>Verified students only</b><span>Email check before you join</span></div></li>
+      <li><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/></svg></span><div><b>Anonymous reporting</b><span>Your name stays hidden from students and routine admin views</span></div></li>
+      <li><span class="ico"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M7 8h8"/><path d="M7 12h10"/><path d="M7 16h6"/></svg></span><div><b>AI classification</b><span>Suggests category and severity. Admins confirm.</span></div></li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h2>Recent reports</h2><a href="report-detail.html">All reports</a></div>
+    <div class="rlist">
+      <a class="rrow" href="report-detail.html"><span class="av amber"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/></svg></span><div><div class="rt">Water supply down, Block C</div><div class="rmeta"><span class="status s-review">Under Review</span><span>14 affected</span><span class="tag demo">Demo</span></div></div></a>
+      <a class="rrow" href="report-detail.html"><span class="av blue"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg></span><div><div class="rt">Broken lift, Faculty of Science</div><div class="rmeta"><span class="status s-resolved">Resolved</span><span>9 affected</span><span class="tag demo">Demo</span></div></div></a>
+      <a class="rrow" href="report-detail.html"><span class="av grey"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></span><div><div class="rt">No power in Lecture Theatre 2</div><div class="rmeta"><span class="status s-progress">In Progress</span><span>22 affected</span><span class="tag demo">Demo</span></div></div></a>
+    </div>
+  </section>
+</div>
+</main>
+<div class="tabbar"><nav aria-label="Room"><a href="index.html" class="on" aria-current="page"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Room</a><a href="report.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Report</a><a href="pulse.html"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>Pulse</a></nav></div>
+</body></html>

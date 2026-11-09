@@ -37,6 +37,10 @@ export function isAdminOf(roles: AdminRole[], universityId: string): boolean {
   );
 }
 
+export function hasAdminRole(roles: AdminRole[]): boolean {
+  return roles.some((role) => role.role === "super_admin" || role.role === "university_admin");
+}
+
 export async function universityBySlug(
   supabase: NonNullable<Awaited<ReturnType<typeof getSession>>["supabase"]>,
   slug: string,

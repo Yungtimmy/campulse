@@ -25,7 +25,7 @@ export default async function RoomHome({ params }: { params: Promise<{ slug: str
   const recent = incidents.slice(0, 3);
 
   return (
-    <RoomFrame slug={slug} name={room.uni.name} active="room">
+    <RoomFrame slug={slug} name={room.uni.name} active="room" showAdmin={room.showAdmin}>
       <section className="hero">
         <h1>
           Your Campus.

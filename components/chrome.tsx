@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminTab } from "@/components/admin-tab";
 import { CategoryIcon, IconBack, IconClipboard, IconHome, IconPlus, IconPulse } from "@/components/icons";
 import { BAND_LABEL, categoryTone, CONFIDENCE_LABEL, roomPill, STATUS_CLASS, STATUS_LABEL } from "@/lib/labels";
 import type { Band, ConfidenceLabel, PulseResult } from "@/lib/pulse";
@@ -52,11 +53,19 @@ export function ForeignRoom({ home }: { home: string }) {
   );
 }
 
-export function TabBar({ slug, active }: { slug: string; active: "room" | "report" | "pulse" }) {
+export function TabBar({
+  slug,
+  active,
+  showAdmin = false,
+}: {
+  slug: string;
+  active: "room" | "report" | "pulse";
+  showAdmin?: boolean;
+}) {
   const base = `/room/${slug}`;
   return (
     <div className="tabbar">
-      <nav aria-label="Room">
+      <nav aria-label="Room" className={showAdmin ? "has-admin" : undefined}>
         <Link href={base} className={active === "room" ? "on" : undefined} aria-current={active === "room" ? "page" : undefined}>
           <IconHome />
           Room
@@ -69,6 +78,7 @@ export function TabBar({ slug, active }: { slug: string; active: "room" | "repor
           <IconPulse />
           Pulse
         </Link>
+        {showAdmin ? <AdminTab /> : null}
       </nav>
     </div>
   );
@@ -79,12 +89,14 @@ export function RoomFrame({
   name,
   active,
   back,
+  showAdmin = false,
   children,
 }: {
   slug: string;
   name?: string;
   active: "room" | "report" | "pulse";
   back?: { href: string; label: string };
+  showAdmin?: boolean;
   children: React.ReactNode;
 }) {
   const pill = roomPill(slug, name);
@@ -111,7 +123,7 @@ export function RoomFrame({
         </header>
         {children}
       </main>
-      <TabBar slug={slug} active={active} />
+      <TabBar slug={slug} active={active} showAdmin={showAdmin} />
     </>
   );
 }
