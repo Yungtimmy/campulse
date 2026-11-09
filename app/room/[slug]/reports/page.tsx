@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CategoryAvatar, DemoChip, RoomFrame, StatusPill } from "@/components/chrome";
+import { CategoryAvatar, RoomFrame, StatusPill } from "@/components/chrome";
 import { loadFeed } from "@/lib/data";
 import { requireRoom } from "@/lib/guard";
 import { CATEGORY_LABEL } from "@/lib/labels";
@@ -30,7 +30,6 @@ export default async function ReportsPage({ params }: { params: Promise<{ slug: 
                     <StatusPill status={incident.status} />
                     <span>{CATEGORY_LABEL[incident.category] ?? incident.category}</span>
                     <span>{incident.affected_count} affected</span>
-                    {incident.is_demo ? <DemoChip /> : null}
                   </div>
                 </div>
               </Link>

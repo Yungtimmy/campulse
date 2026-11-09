@@ -1,7 +1,6 @@
 import { CategoryIcon, IconInfo, IconShieldCheck } from "@/components/icons";
-import { BandName, ConfidenceTag, DemoChip, PulseGauge, RoomFrame } from "@/components/chrome";
+import { BandName, ConfidenceTag, PulseGauge, RoomFrame } from "@/components/chrome";
 import { pulseDelta } from "@/lib/data";
-import { includeDemoPulse } from "@/lib/env";
 import { roomFacts } from "@/lib/facts";
 import { requireRoom } from "@/lib/guard";
 import { BAND_LABEL, COMPONENT_COPY, formatDay, formatPoints, formatWhen } from "@/lib/labels";
@@ -21,11 +20,9 @@ export default async function PulsePage({ params }: { params: Promise<{ slug: st
   const { slug } = await params;
   const room = await requireRoom(slug);
   if (!room.ok) return room.view;
-  const includeDemo = includeDemoPulse();
   const incidents = await loadFeed(room.supabase, room.uni.id);
-  const { result, snapshots } = await loadPulse(room.supabase, room.uni.id, includeDemo);
-  const counted = includeDemo ? incidents : incidents.filter((incident) => !incident.is_demo);
-  const facts = roomFacts(counted, result, {
+  const { result, snapshots } = await loadPulse(room.supabase, room.uni.id);
+  const facts = roomFacts(incidents, result, {
     ackTargetHours: room.uni.ack_target_hours,
     resolveTargetDays: room.uni.resolve_target_days,
   });
@@ -54,7 +51,6 @@ export default async function PulsePage({ params }: { params: Promise<{ slug: st
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
             <ConfidenceTag label={result.label} />
-            {result.includesDemo ? <DemoChip>Includes demo data</DemoChip> : null}
           </div>
           <div className="scale" aria-label="Score bands">
             {BANDS.map((band) => (
@@ -123,7 +119,7 @@ export default async function PulsePage({ params }: { params: Promise<{ slug: st
           </div>
           <Trend snapshots={snapshots} />
           <p className="cap" style={{ marginTop: 8 }}>
-            Daily snapshot. {result.includesDemo ? "Includes demo data." : "Demo incidents are excluded unless PULSE_INCLUDE_DEMO is on."}
+            Daily snapshot of reports in this Room.
           </p>
         </section>
 

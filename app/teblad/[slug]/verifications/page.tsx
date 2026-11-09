@@ -1,18 +1,31 @@
+import Link from "next/link";
+import { CollegeDepartmentFilters } from "@/components/college-department-filters";
 import { approveMember, revokeMember } from "@/lib/actions";
+import { HIDDEN_ADMIN_PATH } from "@/lib/admin-gate";
+import { departmentsFor } from "@/lib/campus";
 import { requireAdmin } from "@/lib/guard";
 import type { Profile } from "@/lib/types";
 
-export default async function VerificationsPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function VerificationsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
   const { slug } = await params;
+  const query = await searchParams;
   const admin = await requireAdmin(slug);
   const { data } = await admin.supabase
     .from("profiles")
     .select("id, display_name, verification_status, verification_method, matric_number, faculty, department, level, created_at")
     .eq("university_id", admin.uni.id)
     .order("created_at", { ascending: false });
-  const profiles = (data ?? []) as unknown as Profile[];
+  const profiles = ((data ?? []) as unknown as Profile[]).filter((profile) => matchesCollege(profile, query));
   const waiting = profiles.filter((profile) => profile.verification_status !== "verified");
   const members = profiles.filter((profile) => profile.verification_status === "verified");
+  const base = `${HIDDEN_ADMIN_PATH}/${slug}/verifications`;
+  const narrowed = Boolean(query.faculty);
 
   return (
     <main className="main">
@@ -22,18 +35,38 @@ export default async function VerificationsPage({ params }: { params: Promise<{ 
           <p>A Google account and a short profile join this Room. Approve or revoke here when access needs a human decision.</p>
         </div>
       </div>
+      <form className="filters" action={base}>
+        <CollegeDepartmentFilters faculty={query.faculty ?? ""} department={query.department ?? ""} />
+        <button className="link-btn clear" type="submit">Apply</button>
+        <Link className="clear" href={base}>Clear</Link>
+      </form>
       <section className="card" style={{ marginTop: 20 }}>
         <h2>Waiting or revoked</h2>
-        {waiting.length === 0 ? <p className="hint" style={{ marginTop: 8 }}>No one is waiting.</p> : null}
+        {waiting.length === 0 ? (
+          <p className="hint" style={{ marginTop: 8 }}>
+            {narrowed ? "No one in this college is waiting." : "No one is waiting."}
+          </p>
+        ) : null}
         <MemberList profiles={waiting} mode="waiting" />
       </section>
       <section className="card" style={{ marginTop: 16 }}>
         <h2>Members</h2>
         <p className="hint" style={{ marginTop: 8 }}>Revoke hides the Room from that account. You cannot change your own row.</p>
+        {members.length === 0 && narrowed ? <p className="hint">No members in this college.</p> : null}
         <MemberList profiles={members} mode="members" selfId={admin.session.user?.id} />
       </section>
     </main>
   );
+}
+
+function matchesCollege(profile: Profile, query: Record<string, string | undefined>) {
+  const faculty = query.faculty ?? "";
+  if (!faculty) return true;
+  if (profile.faculty !== faculty) return false;
+  const department = query.department ?? "";
+  if (!department) return true;
+  if (!(departmentsFor(faculty) as readonly string[]).includes(department)) return true;
+  return profile.department === department;
 }
 
 function MemberList({

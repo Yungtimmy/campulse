@@ -3,14 +3,12 @@ import {
   BandName,
   CategoryAvatar,
   ConfidenceTag,
-  DemoChip,
   MyReportsButton,
   PulseGauge,
   RoomFrame,
   StatusPill,
 } from "@/components/chrome";
 import { IconEyeOff, IconScan, IconUserCheck } from "@/components/icons";
-import { includeDemoPulse } from "@/lib/env";
 import { loadFeed } from "@/lib/data";
 import { requireRoom } from "@/lib/guard";
 import { loadPulse } from "@/lib/pulse-load";
@@ -21,7 +19,7 @@ export default async function RoomHome({ params }: { params: Promise<{ slug: str
   if (!room.ok) return room.view;
 
   const incidents = await loadFeed(room.supabase, room.uni.id);
-  const { result } = await loadPulse(room.supabase, room.uni.id, includeDemoPulse());
+  const { result } = await loadPulse(room.supabase, room.uni.id);
   const recent = incidents.slice(0, 3);
 
   return (
@@ -69,7 +67,6 @@ export default async function RoomHome({ params }: { params: Promise<{ slug: str
           <div className="pulse-foot">
             <span className="cap">0 healthy · 100 emergency · higher is worse</span>
             <ConfidenceTag label={result.label} />
-            {result.includesDemo ? <DemoChip>Demo data</DemoChip> : null}
           </div>
         </Link>
 
@@ -105,7 +102,7 @@ export default async function RoomHome({ params }: { params: Promise<{ slug: str
             <Link href={`/room/${slug}/reports`}>All reports</Link>
           </div>
           {recent.length === 0 ? (
-            <p className="hint">No reports in this Room yet.</p>
+            <p className="hint">No reports yet.</p>
           ) : (
             <div className="rlist">
               {recent.map((incident) => (
@@ -116,7 +113,6 @@ export default async function RoomHome({ params }: { params: Promise<{ slug: str
                     <div className="rmeta">
                       <StatusPill status={incident.status} />
                       <span>{incident.affected_count} affected</span>
-                      {incident.is_demo ? <DemoChip /> : null}
                     </div>
                   </div>
                 </Link>

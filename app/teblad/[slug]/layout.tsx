@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { DemoChip } from "@/components/chrome";
 import { IconBuilding, IconClock, IconFile, IconInbox, IconPulse, IconUserCheck } from "@/components/icons";
 import { HIDDEN_ADMIN_PATH } from "@/lib/admin-gate";
 import { requireAdmin } from "@/lib/guard";
@@ -28,8 +27,6 @@ export default async function AdminLayout({
       .eq("university_id", admin.uni.id)
       .eq("verification_status", "pending"),
   ]);
-  const demoAccount = admin.session.user?.email?.endsWith("@campulse.demo") ?? false;
-
   return (
     <div className="admin">
       <aside className="side" aria-label="Admin navigation">
@@ -69,11 +66,6 @@ export default async function AdminLayout({
         <div className="who">
           <b>{admin.session.profile?.display_name ?? "Room admin"}</b>
           <span className="cap">University administrator · {slug === "funaab" ? "FUNAAB" : admin.uni.name}</span>
-          {demoAccount ? (
-            <div style={{ marginTop: 8 }}>
-              <DemoChip>Demo account</DemoChip>
-            </div>
-          ) : null}
         </div>
       </aside>
       {children}

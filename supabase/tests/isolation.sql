@@ -1,9 +1,103 @@
--- Cross-university isolation. A verified demo-u2 member must see zero FUNAAB rows.
+-- Cross-university isolation. A verified member of a second university must see zero FUNAAB rows.
+-- Demo seed data is retired. This file creates throwaway fixtures, then rolls them back.
 -- Run with: psql -v ON_ERROR_STOP=1 -f supabase/tests/isolation.sql
 
 begin;
 
--- demo-u2 student
+-- Throwaway fixtures. 0005 no longer inserts users, incidents, or evidence.
+do $$
+declare
+  funaab uuid := 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+  u2 uuid := 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';
+  admin_id uuid := '11111111-1111-4111-8111-111111111111';
+  u2_user uuid := '22222222-2222-4222-8222-222222222222';
+  pending_id uuid := '33333333-3333-4333-8333-333333333333';
+  student uuid := '44444444-4444-4444-8444-000000000001';
+  water uuid := 'c1000000-0000-4000-8000-000000000142';
+  flood uuid := 'c1000000-0000-4000-8000-000000000148';
+  canary uuid := 'c2000000-0000-4000-8000-000000000001';
+  canary_report uuid := 'd2000000-0000-4000-8000-000000000001';
+  i int;
+  incident_id uuid;
+  report_id uuid;
+begin
+  insert into public.universities (id, slug, name, email_domains, is_active)
+  values (u2, 'demo-u2', 'Second university', '{}', false)
+  on conflict (id) do nothing;
+
+  insert into auth.users (id, email, email_confirmed_at, raw_user_meta_data)
+  values
+    (admin_id, 'room.admin@example.test', now(), jsonb_build_object('display_name', 'Room admin', 'university_slug', 'funaab')),
+    (u2_user, 'u2.student@example.test', now(), jsonb_build_object('display_name', 'Second room student', 'university_slug', 'demo-u2')),
+    (pending_id, 'pending.student@example.test', null, jsonb_build_object('display_name', 'Pending student', 'university_slug', 'funaab')),
+    (student, 'funaab.student@example.test', now(), jsonb_build_object('display_name', 'FUNAAB student', 'university_slug', 'funaab'));
+
+  insert into public.admin_roles (profile_id, university_id, role)
+  values (admin_id, funaab, 'university_admin');
+
+  for i in 1..12 loop
+    incident_id := case i
+      when 1 then water
+      when 2 then flood
+      else ('c1000000-0000-4000-8000-' || lpad((200 + i)::text, 12, '0'))::uuid
+    end;
+    report_id := ('d1000000-0000-4000-8000-' || lpad(i::text, 12, '0'))::uuid;
+
+    insert into public.incidents (
+      id, university_id, category, severity, priority, title, status, public_code
+    ) values (
+      incident_id, funaab, 'other', 'low', 'low',
+      'Fixture incident ' || i, 'submitted', 'CP-' || lpad((3000 + i)::text, 4, '0')
+    );
+
+    insert into public.reports (
+      id, university_id, incident_id, title, description, category,
+      is_anonymous, author_id, status, public_code
+    ) values (
+      report_id, funaab, incident_id,
+      'Fixture incident ' || i,
+      'Throwaway report created by the isolation test.',
+      'other', false, student, 'submitted', 'CP-' || lpad((4000 + i)::text, 4, '0')
+    );
+
+    insert into public.report_identities (report_id, profile_id)
+    values (report_id, student);
+  end loop;
+
+  insert into public.incidents (
+    id, university_id, category, severity, priority, title, status, public_code
+  ) values (
+    canary, u2, 'other', 'low', 'low', 'Second room canary', 'submitted', 'CP-9001'
+  );
+
+  insert into public.reports (
+    id, university_id, incident_id, title, description, category,
+    is_anonymous, author_id, status, public_code
+  ) values (
+    canary_report, u2, canary, 'Second room canary',
+    'This report belongs to the second university and must stay invisible to the FUNAAB Room.',
+    'other', false, u2_user, 'submitted', 'CP-9002'
+  );
+
+  insert into public.report_identities (report_id, profile_id)
+  values (canary_report, u2_user);
+
+  insert into public.confirmations (incident_id, profile_id)
+  values (water, student);
+
+  insert into public.status_events (incident_id, from_status, to_status, actor_id, note)
+  values (water, null, 'submitted', student, 'Received by Campulse');
+
+  insert into public.admin_audit (actor_id, university_id, action, target_id)
+  values (admin_id, funaab, 'fixture', water);
+
+  insert into storage.objects (bucket_id, name, owner)
+  values
+    ('evidence', funaab::text || '/d1000000-0000-4000-8000-000000000001/photo.jpg', student),
+    ('evidence', u2::text || '/' || canary_report::text || '/photo.jpg', u2_user);
+end $$;
+
+-- second-university student
 select set_config(
   'request.jwt.claims',
   json_build_object(
@@ -181,7 +275,7 @@ end $$;
 
 reset role;
 
--- demo admin: rejected requires a reason, and a reason is accepted
+-- room admin: rejected requires a reason, and a reason is accepted
 select set_config(
   'request.jwt.claims',
   json_build_object(
@@ -197,7 +291,7 @@ declare
   updated public.incidents;
 begin
   if not public.is_uni_admin('aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa') then
-    raise exception 'demo admin is not a FUNAAB admin';
+    raise exception 'room admin is not a FUNAAB admin';
   end if;
 
   begin
@@ -236,7 +330,7 @@ end $$;
 
 reset role;
 
--- Seeded members keep email_otp and are already registered. The pending demo user is not.
+-- Fixture members keep email_otp and are already registered. The pending user is not.
 do $$
 begin
   if not exists (
@@ -248,7 +342,7 @@ begin
       and registered_at is not null
       and faculty is null
   ) then
-    raise exception 'seeded FUNAAB student is missing registration columns';
+    raise exception 'fixture FUNAAB student is missing registration columns';
   end if;
 
   if exists (
@@ -257,7 +351,7 @@ begin
     where id = '33333333-3333-4333-8333-333333333333'
       and (registered_at is not null or verification_status <> 'pending' or verification_method <> 'email_otp')
   ) then
-    raise exception 'pending demo user should stay unregistered';
+    raise exception 'pending user should stay unregistered';
   end if;
 end $$;
 
@@ -356,8 +450,8 @@ begin
 
   update public.profiles
   set display_name = 'Adebola Adeyemi',
-      faculty = 'College of Engineering (demo)',
-      department = 'Computer Science (demo)',
+      faculty = 'College of Engineering (COLENG)',
+      department = 'Mechanical Engineering',
       level = '300',
       matric_number = '2019/1234'
   where id = '55555555-5555-4555-8555-555555555555';
@@ -383,7 +477,7 @@ begin
   end if;
 
   update public.profiles
-  set faculty = 'College of Engineering (demo)'
+  set faculty = 'College of Engineering (COLENG)'
   where id = '44444444-4444-4444-8444-000000000001';
   get diagnostics n = row_count;
   if n <> 0 then
@@ -447,8 +541,8 @@ declare
 begin
   update public.profiles
   set display_name = 'Adebola Adeyemi',
-      faculty = 'College of Natural Sciences (demo)',
-      department = 'Microbiology (demo)',
+      faculty = 'College of Biosciences (COLBIOS)',
+      department = 'Microbiology',
       level = '400'
   where id = '55555555-5555-4555-8555-555555555555';
 

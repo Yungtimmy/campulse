@@ -146,7 +146,6 @@ svg.i.sm{width:16px;height:16px}
 
 /* chips / tags */
 .tag{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:var(--r-tag);font-size:12px;font-weight:500;background:var(--cp-raised);color:var(--cp-ink-2);white-space:nowrap}
-.tag.demo{background:transparent;border:1px dashed var(--cp-line-2);color:var(--cp-ink-3)}
 .tag.pending{background:transparent;border:1px solid rgba(143,101,38,.35);color:var(--cp-amber-ink)}
 .tag.adv{background:var(--cp-blue-tint);color:var(--cp-blue-ink)}
 
@@ -220,6 +219,7 @@ input:focus,textarea:focus,select:focus{outline:none;background:var(--cp-surface
 textarea{min-height:112px;resize:vertical}
 select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236c6a72' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
 select:disabled{color:var(--cp-ink);opacity:1;cursor:default}
+select.wait:disabled{color:var(--cp-ink-3);cursor:not-allowed}
 .count{align-self:flex-end;font-size:12px;color:var(--cp-ink-3)}
 
 .cats{display:grid;grid-template-columns:1fr 1fr;gap:8px}

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Apply every migration to a fresh database, then prove demo-u2 cannot read FUNAAB.
+# Apply every migration to a fresh database, then prove a second university
+# cannot read FUNAAB. Demo seed data is retired. supabase/tests/isolation.sql
+# inserts throwaway fixtures in the same transaction and rolls them back.
 set -euo pipefail
 
 DB="${CAMPULSE_TEST_DB:-campulse_test}"

@@ -15,7 +15,6 @@ type PulseRow = {
   reopened_count: number;
   location_tag: string | null;
   confirmation_count: number;
-  is_demo: boolean;
   ack_target_hours: number;
   resolve_target_days: number;
 };
@@ -23,11 +22,12 @@ type PulseRow = {
 export async function loadPulse(
   supabase: SupabaseClient,
   universityId: string,
-  includeDemo: boolean,
 ): Promise<{ result: PulseResult; snapshots: PulseSnapshot[] }> {
   const { data } = await supabase
     .from("pulse_inputs")
-    .select("*")
+    .select(
+      "id, category, severity, status, opened_at, acknowledged_at, verified_at, resolved_at, reopened_count, location_tag, confirmation_count, ack_target_hours, resolve_target_days",
+    )
     .eq("university_id", universityId);
   const inputs = (data ?? []) as PulseRow[];
   const { data: members } = await supabase.rpc("verified_member_count");
@@ -38,7 +38,6 @@ export async function loadPulse(
     now: new Date(),
     ackTargetHours: inputs[0]?.ack_target_hours ?? 48,
     resolveTargetDays: inputs[0]?.resolve_target_days ?? 7,
-    includeDemo,
   });
 
   const today = new Date().toISOString().slice(0, 10);
@@ -48,18 +47,19 @@ export async function loadPulse(
     p_band: result.band,
     p_label: result.label,
     p_components: result.components,
-    p_includes_demo: includeDemo,
+    p_includes_demo: false,
   });
 
   const { data: snaps } = await supabase
     .from("pulse_snapshots")
-    .select("id, university_id, taken_on, score, band, label, includes_demo")
+    .select("id, university_id, taken_on, score, band, label")
     .eq("university_id", universityId)
+    .eq("includes_demo", false)
     .order("taken_on", { ascending: true });
 
   return {
     result,
-    snapshots: ((snaps ?? []) as PulseSnapshot[]).filter((snapshot) => snapshot.includes_demo === includeDemo),
+    snapshots: (snaps ?? []) as PulseSnapshot[],
   };
 }
 
@@ -76,6 +76,5 @@ function toIncident(row: PulseRow): PulseIncident {
     reopenedCount: row.reopened_count,
     locationTag: row.location_tag,
     confirmationCount: row.confirmation_count,
-    isDemo: row.is_demo,
   };
 }

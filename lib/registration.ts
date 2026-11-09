@@ -1,4 +1,11 @@
-import { FACULTIES, LEVELS, STUDENT_DEPARTMENTS, type Faculty, type Level, type StudentDepartment } from "./campus.ts";
+import {
+  collegeForFaculty,
+  collegeLabel,
+  levelsFor,
+  type Faculty,
+  type Level,
+  type StudentDepartment,
+} from "./campus.ts";
 
 export const DEFAULT_NEXT = "/room/funaab";
 
@@ -63,9 +70,14 @@ export function validateRegistration(
   if (fullName.length < 2) return { ok: false, error: "Enter the name you use on campus" };
   if (fullName.length > NAME_MAX) return { ok: false, error: "That name is too long" };
 
-  if (!isListed(FACULTIES, input.faculty)) return { ok: false, error: "Choose your faculty" };
-  if (!isListed(STUDENT_DEPARTMENTS, input.department)) return { ok: false, error: "Choose your department" };
-  if (!isListed(LEVELS, input.level)) return { ok: false, error: "Choose your level" };
+  const college = collegeForFaculty(input.faculty);
+  if (!college) return { ok: false, error: "Choose your college" };
+  const department = (college.departments as readonly string[]).find((name) => name === input.department);
+  if (!department) return { ok: false, error: "Choose a department in that college" };
+  const allowedLevels = levelsFor(collegeLabel(college), department);
+  if (!(allowedLevels as readonly string[]).includes(input.level)) {
+    return { ok: false, error: "Choose your level" };
+  }
 
   const matric = input.matricNumber.trim();
   if (matric.length > MATRIC_MAX) return { ok: false, error: "Matric number is too long" };
@@ -74,9 +86,9 @@ export function validateRegistration(
     ok: true,
     value: {
       fullName,
-      faculty: input.faculty,
-      department: input.department,
-      level: input.level,
+      faculty: collegeLabel(college),
+      department: department as StudentDepartment,
+      level: input.level as Level,
       matricNumber: matric.length > 0 ? matric : null,
     },
   };
@@ -85,8 +97,4 @@ export function validateRegistration(
 function textField(meta: Record<string, unknown> | null | undefined, key: string): string {
   const value = meta?.[key];
   return typeof value === "string" ? value.trim() : "";
-}
-
-function isListed<T extends string>(list: readonly T[], value: string): value is T {
-  return (list as readonly string[]).includes(value);
 }

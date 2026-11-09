@@ -63,7 +63,6 @@ export function AdminPanel({
       <div className="ph">
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span className="mono" style={{ color: "var(--cp-ink-3)" }}>{incident.public_code}</span>
-          {incident.is_demo ? <span className="tag demo">Demo</span> : null}
         </div>
         <a className="icon-btn" href={clearHref} style={{ width: 32, height: 32, boxShadow: "none", background: "var(--cp-raised)" }} aria-label="Close panel">
           <IconClose />
@@ -134,7 +133,6 @@ export function AdminPanel({
             ))}
           </select>
         </div>
-        <span className="cap">Department list is demo data</span>
       </div>
 
       <div className="sect">

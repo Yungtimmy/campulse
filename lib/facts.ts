@@ -18,7 +18,6 @@ export type RoomFacts = {
   pulseLabel: string;
   ackTargetHours: number;
   resolveTargetDays: number;
-  includesDemo: boolean;
   resolvedWindowDays: number;
   openByCategory: Array<{ category: string; label: string; count: number }>;
 };
@@ -84,7 +83,6 @@ export function roomFacts(
     pulseLabel: pulse.label,
     ackTargetHours: targets.ackTargetHours,
     resolveTargetDays: targets.resolveTargetDays,
-    includesDemo: incidents.some((incident) => incident.is_demo) || pulse.includesDemo,
     resolvedWindowDays: 7,
     openByCategory,
   };

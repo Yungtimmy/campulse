@@ -2,7 +2,8 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { FACULTIES, LEVELS, STUDENT_DEPARTMENTS } from "@/lib/campus";
+import { CollegeDepartmentFields } from "@/components/college-department-fields";
+import { levelsFor, type Level } from "@/lib/campus";
 import { completeRegistration } from "@/lib/actions";
 
 export function RegisterForm({
@@ -19,6 +20,10 @@ export function RegisterForm({
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [faculty, setFaculty] = useState("");
+  const [department, setDepartment] = useState("");
+  const [level, setLevel] = useState("");
+  const levels = faculty ? levelsFor(faculty, department) : [];
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,43 +78,43 @@ export function RegisterForm({
           <input id="full-name" name="fullName" type="text" defaultValue={fullName} autoComplete="name" required />
           <span className="hint">Filled from Google. Change it if it&apos;s not the name you use on campus.</span>
         </div>
-        <div className="field">
-          <label htmlFor="faculty">Faculty</label>
-          <select id="faculty" name="faculty" defaultValue="" required>
-            <option value="" disabled>
-              Choose your faculty
-            </option>
-            {FACULTIES.map((faculty) => (
-              <option key={faculty} value={faculty}>
-                {faculty}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor="department">Department</label>
-          <select id="department" name="department" defaultValue="" required>
-            <option value="" disabled>
-              Choose your department
-            </option>
-            {STUDENT_DEPARTMENTS.map((department) => (
-              <option key={department} value={department}>
-                {department}
-              </option>
-            ))}
-          </select>
-        </div>
+        <CollegeDepartmentFields
+          required
+          faculty={faculty}
+          department={department}
+          onFacultyChange={(next) => {
+            setFaculty(next);
+            setDepartment("");
+            setLevel("");
+          }}
+          onDepartmentChange={(next) => {
+            setDepartment(next);
+            if (!(levelsFor(faculty, next) as readonly string[]).includes(level)) setLevel("");
+          }}
+        />
         <div className="field">
           <label htmlFor="level">Level</label>
-          <select id="level" name="level" defaultValue="" required>
-            <option value="" disabled>
-              Choose your level
-            </option>
-            {LEVELS.map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
+          <select
+            id="level"
+            name="level"
+            value={levels.includes(level as Level) ? level : ""}
+            required
+            disabled={!faculty}
+            className={faculty ? undefined : "wait"}
+            onChange={(event) => setLevel(event.target.value)}
+          >
+            {faculty ? (
+              <>
+                <option value="">Choose your level</option>
+                {levels.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </>
+            ) : (
+              <option value="">Pick your college first</option>
+            )}
           </select>
         </div>
         <div className="field">

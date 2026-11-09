@@ -46,7 +46,6 @@ export type PulseIncident = {
   reopenedCount: number;
   locationTag: string | null;
   confirmationCount: number;
-  isDemo: boolean;
 };
 
 export type PulseInput = {
@@ -56,7 +55,6 @@ export type PulseInput = {
   ackTargetHours?: number;
   resolveTargetDays?: number;
   windowDays?: number;
-  includeDemo?: boolean;
 };
 
 export type ComponentScore = {
@@ -73,7 +71,6 @@ export type PulseResult = {
   rawScore: number | null;
   band: Band | null;
   label: ConfidenceLabel;
-  includesDemo: boolean;
   countedIncidents: number;
   verifiedMembers: number;
   components: ComponentScore[];
@@ -167,13 +164,9 @@ export function computePulse(input: PulseInput): PulseResult {
   const windowDays = input.windowDays ?? WINDOW_DAYS;
   const ackTargetHours = input.ackTargetHours ?? ACK_TARGET_HOURS;
   const resolveTargetDays = input.resolveTargetDays ?? RESOLVE_TARGET_DAYS;
-  const includeDemo = input.includeDemo === true;
 
   const incidents = input.incidents.filter(
-    (incident) =>
-      (includeDemo || !incident.isDemo) &&
-      incident.status !== "rejected" &&
-      inWindow(incident, now, windowDays),
+    (incident) => incident.status !== "rejected" && inWindow(incident, now, windowDays),
   );
 
   const countedIncidents = incidents.filter(
@@ -276,7 +269,6 @@ export function computePulse(input: PulseInput): PulseResult {
     rawScore: showNumber ? combined.raw : null,
     band: showNumber && combined.score !== null ? bandFor(combined.score) : null,
     label,
-    includesDemo: includeDemo && input.incidents.some((incident) => incident.isDemo),
     countedIncidents,
     verifiedMembers: input.verifiedMembers,
     components: COMPONENT_ORDER.map((key) => {

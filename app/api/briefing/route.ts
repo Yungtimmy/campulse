@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { loadFeed } from "@/lib/data";
-import { includeDemoPulse } from "@/lib/env";
 import { briefingSentences, narrativeUsesOnlyFacts, roomFacts } from "@/lib/facts";
 import { groqJson } from "@/lib/groq";
 import { loadPulse } from "@/lib/pulse-load";
@@ -23,7 +22,7 @@ export async function POST(request: Request) {
   }
 
   const incidents = await loadFeed(session.supabase, uni.id);
-  const { result } = await loadPulse(session.supabase, uni.id, includeDemoPulse());
+  const { result } = await loadPulse(session.supabase, uni.id);
   const facts = roomFacts(incidents, result, {
     ackTargetHours: uni.ack_target_hours,
     resolveTargetDays: uni.resolve_target_days,
@@ -42,7 +41,7 @@ export async function POST(request: Request) {
       : null;
 
   if (!narrative || !narrativeUsesOnlyFacts(narrative, facts)) {
-    return NextResponse.json({ narrative: fallback, source: "records", includesDemo: facts.includesDemo });
+    return NextResponse.json({ narrative: fallback, source: "records" });
   }
-  return NextResponse.json({ narrative, source: "groq", includesDemo: facts.includesDemo });
+  return NextResponse.json({ narrative, source: "groq" });
 }
