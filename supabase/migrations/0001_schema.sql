@@ -57,24 +57,31 @@ begin
 end $$;
 
 -- Storage shim. Hosted Supabase already has storage.buckets / storage.objects.
-create schema if not exists storage;
+do $sch$ begin if not exists (select 1 from pg_namespace where nspname = 'storage') then create schema storage; end if; end $sch$;
 
-create table if not exists storage.buckets (
-  id text primary key,
-  name text not null,
-  public boolean not null default false,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists storage.objects (
-  id uuid primary key default gen_random_uuid(),
-  bucket_id text,
-  name text,
-  owner uuid,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
+-- Only create the shim when storage tables are missing (plain Postgres in CI).
+do $shim$
+begin
+  if to_regclass('storage.buckets') is null then
+    create table storage.buckets (
+      id text primary key,
+      name text not null,
+      public boolean not null default false,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    );
+  end if;
+  if to_regclass('storage.objects') is null then
+    create table storage.objects (
+      id uuid primary key default gen_random_uuid(),
+      bucket_id text,
+      name text,
+      owner uuid,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    );
+  end if;
+end $shim$;
 
 do $$
 begin
